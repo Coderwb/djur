@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alla Djur i Hela Världen</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #eef5f0; color: #333; }
+        header { background-color: #1b4d22; color: white; padding: 40px 20px; text-align: center; }
+        .search-container { text-align: center; margin: -25px auto 20px auto; max-width: 600px; padding: 0 20px; }
+        input[type="text"] { width: 70%; padding: 15px; border: 2px solid #1b4d22; border-radius: 25px 0 0 25px; font-size: 16px; outline: none; }
+        button { width: 25%; padding: 15px; background: #2e7d32; color: white; border: 2px solid #1b4d22; border-left: none; border-radius: 0 25px 25px 0; font-size: 16px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1b4d22; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
+        h2 { color: #1b4d22; margin-top: 0; text-transform: capitalize; border-bottom: 2px solid #eef5f0; padding-bottom: 10px; }
+        .info-segment { margin: 15px 0; }
+        .label { font-weight: bold; color: #2e7d32; display: block; }
+        .status { text-align: center; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Register över ALLA djur i världen</h1>
+        <p>Sök på valfritt djur för att se hur de lever och bor</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="animalInput" placeholder="Skriv ett djur... (t.ex. Gepard, Blåmes, Myra)">
+        <button onclick="searchAnimal()">Sök djur</button>
+    </div>
+
+    <div class="container">
+        <div id="statusMessage" class="status">Skriv in ett djur ovan för att hämta information från världsregistret...</div>
+        
+        <div id="animalCard" class="card">
+            <h2 id="animalName">Djurnamn</h2>
+            
+            <div class="info-segment">
+                <span class="label">Om djuret & livsstil:</span>
+                <p id="animalInfo">Information laddas...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function searchAnimal() {
+            const query = document.getElementById('animalInput').value.trim();
+            const statusBox = document.getElementById('statusMessage');
+            const card = document.getElementById('animalCard');
+            
+            if (!query) {
+                statusBox.innerText = "Vänligen skriv in ett djurnamn först.";
+                card.style.display = "none";
+                return;
+            }
+
+            statusBox.innerText = `Letar i världsdatabasen efter "${query}"...`;
+            card.style.display = "none";
+
+            try {
+                // Anropar Wikipedia API på svenska för att hämta ALLA möjliga djur live
+                const response = await fetch(`https://wikipedia.org{encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error("Hittade inte djuret");
+                }
+
+                const data = await response.json();
+                
+                statusBox.innerText = "";
+                document.getElementById('animalName').innerText = data.title;
+                document.getElementById('animalInfo').innerText = data.extract;
+                card.style.style.display = "block";
+                card.style.display = "block";
+                
+            } catch (error) {
+                statusBox.innerText = `Kunde inte hitta "${query}". Kontrollera stavningen eller prova ett annat djur (t.ex. fästing, schimpans, guldfisk).`;
+                card.style.display = "none";
+            }
+        }
+
+        // Gör så att man kan trycka på Enter-knappen för att söka
+        document.getElementById("animalInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchAnimal();
+            }
+        });
+    </script>
+
+</body>
+</html>
