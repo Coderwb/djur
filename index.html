@@ -38,13 +38,20 @@
             font-size: 1.1rem;
             text-align: center;
         }
-        .sok-sektion {
+        .sok-sektion, .admin-skapa-sektion {
             max-width: 500px;
             margin: 0 auto 35px auto;
             display: flex;
             gap: 10px;
         }
-        .sok-input {
+        .admin-skapa-sektion {
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px dashed #4ade80;
+        }
+        .sok-input, .admin-input {
             flex: 1;
             padding: 14px 20px;
             border: 2px solid #334155;
@@ -54,8 +61,13 @@
             font-size: 16px;
             outline: none;
         }
-        .sok-input:focus { border-color: #4ade80; }
-        .sok-knapp {
+        .admin-input {
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .sok-input:focus, .admin-input:focus { border-color: #4ade80; }
+        .sok-knapp, .admin-knapp {
             padding: 14px 28px;
             background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
             color: #0f172a;
@@ -64,6 +76,10 @@
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
+        }
+        .admin-knapp {
+            border-radius: 8px;
+            padding: 10px;
         }
         .djur-layout {
             display: flex;
@@ -95,7 +111,6 @@
         .info-text { line-height: 1.7; color: #cbd5e1; font-size: 15px; }
         .status-meddelande { color: #94a3b8; text-align: center; padding: 20px; font-style: italic; }
         
-        /* Grafisk natursymbol istället för externa bilder som kan blockeras */
         .djur-ikon-box {
             width: 100%;
             height: 260px;
@@ -108,6 +123,30 @@
             border: 2px solid rgba(74, 222, 128, 0.2);
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
         }
+
+        /* Admin sektion längst ner */
+        .admin-panel {
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+        }
+        .admin-länk {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .admin-länk:hover { color: #4ade80; }
+        .admin-box {
+            display: none;
+            max-width: 300px;
+            margin: 15px auto;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -116,66 +155,153 @@
         <h1>🌍 Världens Alla Djur 🦁</h1>
         <p class="subtitle">Skriv in vilket djur som helst i hela världen för att utforska det!</p>
         
+        <!-- SÖKFÄLT -->
         <div class="sok-sektion">
             <input type="text" id="sokFalt" class="sok-input" placeholder="Skriv ett djur (t.ex. varg, elefant, blåval)...">
             <button onclick="genereraDjur()" class="sok-knapp">Sök</button>
         </div>
 
+        <!-- NYHET: SKAPA EGET DJUR (VISAS BARA FÖR INLOGGAD ADMIN) -->
+        <div id="adminSkapaYta" class="admin-skapa-sektion" style="display: none;">
+            <h3 style="margin-top: 0; color: #4ade80;">⚙️ Adminverktyg: Lägg till specialfakta</h3>
+            <input type="text" id="adminNamn" class="admin-input" placeholder="Djurets namn...">
+            <input type="text" id="adminBor" class="admin-input" placeholder="Var bor djuret?">
+            <input type="text" id="adminAter" class="admin-input" placeholder="Vad äter djuret?">
+            <textarea id="adminBeskrivning" class="admin-input" placeholder="Lång beskrivning..." rows="3" style="border-radius:8px; font-family:inherit; color:white;"></textarea>
+            <input type="text" id="adminIkon" class="admin-input" placeholder="Emoji som bild (t.ex. 🦊, 🐻, 🐲)...">
+            <button onclick="sparaEgetDjur()" class="admin-knapp">Spara djur i databasen</button>
+        </div>
+
+        <!-- RESULTAT -->
         <div id="djurInnehall">
             <div class="status-meddelande">Skriv valfritt djurnamn i rutan ovan för att starta!</div>
+        </div>
+
+        <!-- HEMLIG ADMIN-INLOGGNING -->
+        <div class="admin-panel">
+            <span class="admin-länk" onclick="visaInloggning()">🔒 Admin Login</span>
+            
+            <div id="inloggningsBox" class="admin-box">
+                <input type="text" id="adminAnvandare" class="admin-input" placeholder="Användarnamn" style="margin-bottom: 8px;">
+                <input type="password" id="adminLosen" class="admin-input" placeholder="Lösenord" style="margin-bottom: 12px;">
+                <button onclick="loggaInAdmin()" class="admin-knapp" style="width: 100%;">Logga in</button>
+                <p id="adminFel" style="color: #ef4444; font-size: 0.85rem; margin-top: 10px; display: none;">Fel uppgifter!</p>
+            </div>
         </div>
     </div>
 
     <script>
+        // Egen lokal databas för djur som admin lägger till själv
+        const adminDjurDatabas = {};
+
         document.getElementById('sokFalt').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') genereraDjur();
         });
 
-        // Denna funktion körs helt lokalt och kan ALDRIG visa nätverksfel
+        // Visar/döljer inloggningsrutan
+        function visaInloggning() {
+            const box = document.getElementById('inloggningsBox');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Kontrollerar dina admin-uppgifter
+        function loggaInAdmin() {
+            const user = document.getElementById('adminAnvandare').value;
+            const pass = document.getElementById('adminLosen').value;
+            const felMsg = document.getElementById('adminFel');
+            const skapaYta = document.getElementById('adminSkapaYta');
+            const logInBox = document.getElementById('inloggningsBox');
+
+            if (user === "Coderwb" && pass === "MelloOlof") {
+                skapaYta.style.display = "flex";
+                logInBox.style.display = "none";
+                alert("Välkommen tillbaka, Coderwb! Adminverktyget har låsts upp.");
+            } else {
+                felMsg.style.display = "block";
+            }
+        }
+
+        // Sparar admins anpassade djur i minnet
+        function sparaEgetDjur() {
+            const namn = document.getElementById('adminNamn').value.trim();
+            const bor = document.getElementById('adminBor').value.trim();
+            const ater = document.getElementById('adminAter').value.trim();
+            const besk = document.getElementById('adminBeskrivning').value.trim();
+            const ikon = document.getElementById('adminIkon').value.trim() || "🐾";
+
+            if (!namn) {
+                alert("Du måste skriva ett djurnamn!");
+                return;
+            }
+
+            const nyckel = namn.toLowerCase();
+            adminDjurDatabas[nyckel] = {
+                namn: namn,
+                bor: bor || "Ingen data angiven av admin.",
+                ater: ater || "Ingen data angiven av admin.",
+                fakta: besk || "Ingen beskrivning skriven än.",
+                symbol: ikon
+            };
+
+            alert(`Klart! "${namn}" har lagts till. Testa att söka efter det nu!`);
+            
+            // Töm fälten efteråt
+            document.getElementById('adminNamn').value = "";
+            document.getElementById('adminBor').value = "";
+            document.getElementById('adminAter').value = "";
+            document.getElementById('adminBeskrivning').value = "";
+            document.getElementById('adminIkon').value = "";
+        }
+
+        // Huvudsökfunktionen
         function genereraDjur() {
             const sökordRaw = document.getElementById('sokFalt').value.trim();
             const innehallDiv = document.getElementById('djurInnehall');
             
             if (!sökordRaw) return;
 
+            const nyckel = sökordRaw.toLowerCase();
             const djurNamn = sökordRaw.charAt(0).toUpperCase() + sökordRaw.slice(1).toLowerCase();
             
             let livsmiljö = "Lever i vilt tillstånd anpassat efter artens naturliga klimatzon.";
             let mat = "Varierad kost. Kan vara en växtätare, köttätare eller allätare.";
-            let beskrivning = `${djurNamn} är en viktig del av jordens fantastiska djurliv. Den har utvecklat speciella sinnen och unika egenskaper för att anpassa sig till sin miljö, hitta föda och skydda sin familj.`;
+            let beskrivning = `${djurNamn} är en viktig del av jordens fantastiska djurliv. Den har utvecklat speciella sinnen och unika egenskaper för att anpassa sig till sin miljö.`;
             let symbol = "🐾"; 
 
-            const textKoll = djurNamn.toLowerCase();
-            
-            // Smarta lokala anpassningar baserat på sökordet
-            if (textKoll.includes("val") || textKoll.includes("delfin") || textKoll.includes("valhaj")) {
-                livsmiljö = "De djupa världshaven och oceanerna. Vandrar ofta långa sträckor.";
-                mat = "Små marina kräftdjur (krill), plankton eller fiskar.";
-                symbol = "🐋";
-            } else if (textKoll.includes("haj") || textKoll.includes("fisk") || textKoll.includes("torsk")) {
-                livsmiljö = "Hav, sjöar, korallrev eller strömmande vattendrag.";
-                mat = "Vattenväxter, alger eller mindre vattenlevande djur.";
-                symbol = "🐟";
-            } else if (textKoll.includes("fågel") || textKoll.includes("örn") || textKoll.includes("uggla") || textKoll.includes("mås")) {
-                livsmiljö = "Skogar, klippor, trädtoppar eller öppna landskap över hela världen.";
-                mat = "Insekter, frön, bär, fiskar eller mindre bytesdjur.";
-                symbol = "🦅";
-            } else if (textKoll.includes("orm") || textKoll.includes("ödla") || textKoll.includes("krokodil")) {
-                livsmiljö = "Tropiska regnskogar, torra öknar eller varma klippområden.";
-                mat = "Små däggdjur, insekter, fåglar eller ägg.";
-                symbol = "🐍";
-            } else if (textKoll.includes("lejon") || textKoll.includes("tiger") || textKoll.includes("katt") || textKoll.includes("lo")) {
-                livsmiljö = "Savanner, täta djungler, skogar eller i närheten av människor.";
-                mat = "Kött. De är skickliga jägare med extremt vassa sinnen.";
-                symbol = "🦁";
-            } else if (textKoll.includes("hund") || textKoll.includes("varg") || textKoll.includes("räv")) {
-                livsmiljö = "Skogsområden, tundra, berg eller som husdjur i hemmen.";
-                mat = "Kött, bytesdjur eller anpassat foder.";
-                symbol = "🐺";
-            } else if (textKoll.includes("insekt") || textKoll.includes("myra") || textKoll.includes("bi") || textKoll.includes("fluga")) {
-                livsmiljö = "I vegetationen, under stenar, i jorden eller surrande i luften.";
-                mat = "Nektar, växtsaft, blad eller andra mindre kryp.";
-                symbol = "🪲";
+            // KOLLA OM ADMIN HAR SKAPAT DETTA DJUR FÖRST
+            if (adminDjurDatabas[nyckel]) {
+                const egetDjur = adminDjurDatabas[nyckel];
+                livsmiljö = egetDjur.bor;
+                mat = egetDjur.ater;
+                beskrivning = egetDjur.fakta;
+                symbol = egetDjur.symbol;
+            } else {
+                // Annars körs den smarta automatiska generatorn
+                if (nyckel.includes("val") || nyckel.includes("delfin")) {
+                    livsmiljö = "De djupa världshaven och oceanerna. Vandrar ofta långa sträckor.";
+                    mat = "Små marina kräftdjur (krill), plankton eller fiskar.";
+                    symbol = "🐋";
+                } else if (nyckel.includes("haj") || nyckel.includes("fisk")) {
+                    livsmiljö = "Hav, sjöar, korallrev eller strömmande vattendrag.";
+                    mat = "Vattenväxter, alger eller mindre vattenlevande djur.";
+                    symbol = "🐟";
+                } else if (nyckel.includes("fågel") || nyckel.includes("örn") || nyckel.includes("uggla")) {
+                    livsmiljö = "Skogar, klippor, trädtoppar eller öppna landskap över hela världen.";
+                    mat = "Insekter, frön, bär, fiskar eller mindre bytesdjur.";
+                    symbol = "🦅";
+                } else if (nyckel.includes("orm") || nyckel.includes("ödla") || nyckel.includes("krokodil")) {
+                    livsmiljö = "Tropiska regnskogar, torra öknar eller varma klippområden.";
+                    mat = "Små däggdjur, insekter, fåglar eller ägg.";
+                    symbol = "🐍";
+                } else if (nyckel.includes("lejon") || nyckel.includes("tiger") || nyckel.includes("katt")) {
+                    livsmiljö = "Savanner, täta djungler eller skogar.";
+                    mat = "Kött. De är skickliga jägare med extremt vassa sinnen.";
+                    symbol = "🦁";
+                } else if (nyckel.includes("hund") || nyckel.includes("varg") || nyckel.includes("räv")) {
+                    livsmiljö = "Skogsområden, tundra, berg eller som husdjur i hemmen.";
+                    mat = "Kött, bytesdjur eller anpassat foder.";
+                    symbol = "🐺";
+                }
             }
 
             innehallDiv.innerHTML = `
