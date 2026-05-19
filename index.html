@@ -15,7 +15,7 @@
             text-align: center;
         }
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 30px auto;
             background: white;
             padding: 30px;
@@ -25,7 +25,7 @@
         h1 { color: #1e4620; margin-bottom: 5px; }
         p.subtitle { color: #7f8c8d; margin-bottom: 25px; }
         
-        /* Flikar och Kategorier */
+        /* Meny med djurknappar */
         .kategorier {
             display: flex;
             justify-content: center;
@@ -49,103 +49,137 @@
             transform: translateY(-2px);
         }
 
-        /* Visning av valt djur */
-        #djurInnehall {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 2px solid #f0f7f4;
-            padding-top: 20px;
-        }
+        /* Layout för djurvisning */
         .djur-layout {
             display: flex;
             gap: 25px;
             flex-wrap: wrap;
+            text-align: left;
+            border-top: 2px solid #f0f7f4;
+            padding-top: 20px;
         }
         .djur-info { flex: 1; min-width: 300px; }
         .djur-bild-box { flex: 1; min-width: 300px; text-align: center; }
         
         img {
             max-width: 100%;
-            height: auto;
+            height: 250px;
+            object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .laddar {
-            font-size: 18px;
-            color: #7f8c8d;
-            padding: 40px;
+        .fakta-punkt {
+            margin: 8px 0;
+            padding: 6px 12px;
+            background-color: #f4f9f4;
+            border-left: 4px solid #2e7d32;
+            border-radius: 0 4px 4px 0;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🌍 Världens Alla Djurgrupper 🦁</h1>
-        <p class="subtitle">Klicka på en kategori för att utforska och lära dig om djuren på svenska</p>
+        <h1>🌍 Utforska Världens Djur 🦁</h1>
+        <p class="subtitle">Klicka på ett djur för att se var de bor, vad de äter och hur de lever!</p>
         
-        <!-- Knappar för olika djur -->
-        <div class="kategorier">
-            <button class="kat-knapp aktiv" onclick="visaDjur('Blåval', this)">🐋 Blåval</button>
-            <button class="kat-knapp" onclick="visaDjur('Lejon', this)">🦁 Lejon</button>
-            <button class="kat-knapp" onclick="visaDjur('Schimpans', this)">🐒 Schimpans</button>
-            <button class="kat-knapp" onclick="visaDjur('Vandringsalkatraz', this)">🦅 Albatross</button>
-            <button class="kat-knapp" onclick="visaDjur('Guldfisk', this)">🐠 Guldfisk</button>
-            <button class="kat-knapp" onclick="visaDjur('Fästingar', this)">🕷️ Fästing</button>
-        </div>
+        <!-- Knappar för att välja djur -->
+        <div class="kategorier" id="knappYta"></div>
 
-        <!-- Här laddas djurinfon in automatiskt -->
-        <div id="djurInnehall">
-            <div class="laddar">Laddar djurvärlden...</div>
-        </div>
+        <!-- Här visas djuret som valts -->
+        <div id="djurInnehall"></div>
     </div>
 
     <script>
-        async function visaDjur(djurNamn, knappElement) {
-            const innehallDiv = document.getElementById('djurInnehall');
-            innehallDiv.innerHTML = '<div class="laddar">Hämtar spännande fakta från databasen...</div>';
+        // Inbyggd databas med all fakta och säkra Unsplash-bilder
+        const djurDatabas = {
+            blåval: {
+                namn: "Blåval 🐋",
+                bor: "Alla världens stora hav, men vandrar mot polerna på sommaren.",
+                ater: "Enormt stora mängder krill (små kräftdjur).",
+                fakta: "Blåvalen är det absolut största djuret som någonsin har levt på jorden. Bara dess tunga kan väga lika mycket som en hel elefant!",
+                bild: "https://unsplash.com"
+            },
+            lejon: {
+                namn: "Lejon 🦁",
+                bor: "Subsahariska Afrika samt i en liten skyddad skog i Indien.",
+                ater: "Kött (zebror, gnuantiloper och andra gräsätare).",
+                fakta: "Lejon lever i flockar, till skillnad från de flesta andra kattdjur. Det är oftast honoma (lejoninnorna) som jagar tillsammans.",
+                bild: "https://unsplash.com"
+            },
+            schimpans: {
+                namn: "Schimpans 🐒",
+                bor: "Tropiska regnskogar och fuktiga savanner i Central- och Västafrika.",
+                ater: "Frukt, blad, frön, insekter och ibland mindre djur.",
+                fakta: "Schimpanser är otroligt smarta och använder verktyg, som pinnar för att fiska efter termiter eller stenar för att knäcka nötter.",
+                bild: "https://unsplash.com"
+            },
+            albatross: {
+                namn: "Albatross 🦅",
+                bor: "Södra oceanen och norra Stilla havet, mestadels uppe i luften över öppet hav.",
+                ater: "Fisk, bläckfisk och krill som de fångar vid havsytan.",
+                fakta: "De har världens största vingspann (upp till 3,5 meter). De kan flyga tusentals mil utan att slå med vingarna en enda gång!",
+                bild: "https://unsplash.com"
+            },
+            guldfisk: {
+                namn: "Guldfisk 🐠",
+                bor: "Ursprungligen från sötvatten i Östasien, nu i akvarier och dammar över hela världen.",
+                ater: "Alger, växter, små insekter och färdigt fiskfoder.",
+                fakta: "Det är en myt att guldfiskar bara har tre sekunders minne. Forskning visar att de kan komma ihåg saker i flera månader!",
+                bild: "https://unsplash.com"
+            }
+        };
 
-            // Hantera vilken knapp som lyser grönt
+        // Funktion för att rita upp knapparna automatiskt
+        function skapaMeny() {
+            const knappYta = document.getElementById('knappYta');
+            let forstaDjur = true;
+
+            for (const nyckel in djurDatabas) {
+                const djur = djurDatabas[nyckel];
+                const knapp = document.createElement('button');
+                knapp.className = 'kat-knapp' + (forstaDjur ? ' aktiv' : '');
+                knapp.innerText = djur.namn;
+                knapp.onclick = (e) => visaDjur(nyckel, e.target);
+                knappYta.appendChild(knapp);
+                
+                if (forstaDjur) {
+                    visaDjur(nyckel);
+                    forstaDjur = false;
+                }
+            }
+        }
+
+        // Funktion för att visa valt djurs fakta
+        function visaDjur(id, knappElement) {
             if (knappElement) {
                 document.querySelectorAll('.kat-knapp').forEach(btn => btn.classList.remove('aktiv'));
                 knappElement.classList.add('aktiv');
             }
 
-            try {
-                // Hämtar direkt från svenska Wikipedia på ett säkert sätt
-                const url = `https://wikipedia.org{encodeURIComponent(djurNamn)}`;
-                const svar = await fetch(url);
-                
-                if (!svar.ok) throw new Error('Kunde inte läsa data.');
-                const data = await svar.json();
+            const djur = djurDatabas[id];
+            const innehallDiv = document.getElementById('djurInnehall');
 
-                // Skapar ett snyggt kort med text till vänster och bild till höger
-                innehallDiv.innerHTML = `
-                    <div class="djur-layout">
-                        <div class="djur-info">
-                            <h2 style="color:#2e7d32; margin-top:0;">${data.title}</h2>
-                            <p style="line-height: 1.7; font-size: 16px;">${data.extract}</p>
-                            <p style="margin-top:20px;">
-                                <a href="${data.content_urls.desktop.page}" target="_blank" style="color:#2e7d32; font-weight:bold; text-decoration:none;">
-                                    Läs hela forskningsartikeln här ➔
-                                </a>
-                            </p>
-                        </div>
-                        <div class="djur-bild-box">
-                            ${data.thumbnail ? `<img src="${data.thumbnail.source}" alt="${data.title}">` : '<p>Bild saknas för detta djur.</p>'}
-                        </div>
+            innehallDiv.innerHTML = `
+                <div class="djur-layout">
+                    <div class="djur-info">
+                        <h2 style="color:#2e7d32; margin-top:0;">${djur.namn}</h2>
+                        
+                        <div class="fakta-punkt"><b>🌍 Var de lever/bor:</b> ${djur.bor}</div>
+                        <div class="fakta-punkt"><b>🥩 Vad de äter:</b> ${djur.ater}</div>
+                        
+                        <h3 style="margin-top:20px; color:#1e4620;">Hur de lever & Livsstil</h3>
+                        <p style="line-height: 1.6; font-size: 15px;">${djur.fakta}</p>
                     </div>
-                `;
-
-            } catch (fel) {
-                innehallDiv.innerHTML = '<p style="color:red; padding:20px;">Kunde inte ladda djuret just nu. Testa en annan flik.</p>';
-            }
+                    <div class="djur-bild-box">
+                        <img src="${djur.bild}" alt="${djur.namn}">
+                    </div>
+                </div>
+            `;
         }
 
-        // Starta med att visa blåvalen direkt när hemsidan öppnas
-        window.onload = () => {
-            const forstaKnapp = document.querySelector('.kat-knapp');
-            visaDjur('Blåval', forstaKnapp);
-        };
+        // Kör igång programmet direkt när sidan laddas
+        window.onload = skapaMeny;
     </script>
 
 </body>
