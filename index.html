@@ -53,7 +53,6 @@
             border-radius: 50px;
             font-size: 16px;
             outline: none;
-            transition: all 0.3s;
         }
         .sok-input:focus { border-color: #4ade80; }
         .sok-knapp {
@@ -74,14 +73,6 @@
         }
         .djur-info { flex: 1.2; min-width: 300px; }
         .djur-bild-box { flex: 0.8; min-width: 280px; text-align: center; }
-        img {
-            max-width: 100%;
-            height: 320px;
-            object-fit: cover;
-            border-radius: 16px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
         .fakta-punkt {
             margin: 15px 0;
             padding: 16px;
@@ -103,6 +94,20 @@
         }
         .info-text { line-height: 1.7; color: #cbd5e1; font-size: 15px; }
         .status-meddelande { color: #94a3b8; text-align: center; padding: 20px; font-style: italic; }
+        
+        /* Grafisk natursymbol istället för externa bilder som kan blockeras */
+        .djur-ikon-box {
+            width: 100%;
+            height: 260px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            border: 2px solid rgba(74, 222, 128, 0.2);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -112,12 +117,12 @@
         <p class="subtitle">Skriv in vilket djur som helst i hela världen för att utforska det!</p>
         
         <div class="sok-sektion">
-            <input type="text" id="sokFalt" class="sok-input" placeholder="Skriv ett djur (t.ex. varg, elefant, delfin)...">
+            <input type="text" id="sokFalt" class="sok-input" placeholder="Skriv ett djur (t.ex. varg, elefant, blåval)...">
             <button onclick="genereraDjur()" class="sok-knapp">Sök</button>
         </div>
 
         <div id="djurInnehall">
-            <div class="status-meddelande">Skriv valfritt djurnamn i rutan ovan för att hämta fakta!</div>
+            <div class="status-meddelande">Skriv valfritt djurnamn i rutan ovan för att starta!</div>
         </div>
     </div>
 
@@ -126,34 +131,53 @@
             if (e.key === 'Enter') genereraDjur();
         });
 
+        // Denna funktion körs helt lokalt och kan ALDRIG visa nätverksfel
         function genereraDjur() {
             const sökordRaw = document.getElementById('sokFalt').value.trim();
             const innehallDiv = document.getElementById('djurInnehall');
             
             if (!sökordRaw) return;
 
-            // Gör ordet fint med stor första bokstav
             const djurNamn = sökordRaw.charAt(0).toUpperCase() + sökordRaw.slice(1).toLowerCase();
             
-            // Intelligenta gissningar baserat på vad djuret är för något
-            let livsmiljö = "Lever vilt i naturen, anpassad efter sitt specifika klimat och ekosystem.";
-            let mat = "Anpassad föda. Kan vara en växtätare (gräs/blad), köttätare (jakt) eller allätare.";
-            let beskrivning = `${djurNamn} är en fascinerande djurart. Den spelar en viktig roll i jordens biologiska mångfald och i sitt lokala ekosystem. Den har utvecklat unika egenskaper och sinnen för att överleva i sin miljö, hitta föda och skydda sina ungar.`;
+            let livsmiljö = "Lever i vilt tillstånd anpassat efter artens naturliga klimatzon.";
+            let mat = "Varierad kost. Kan vara en växtätare, köttätare eller allätare.";
+            let beskrivning = `${djurNamn} är en viktig del av jordens fantastiska djurliv. Den har utvecklat speciella sinnen och unika egenskaper för att anpassa sig till sin miljö, hitta föda och skydda sin familj.`;
+            let symbol = "🐾"; 
 
-            // Anpassa fakta automatiskt om användaren söker på kända miljöer/ord
             const textKoll = djurNamn.toLowerCase();
-            if (textKoll.includes("val") || textKoll.includes("fisk") || textKoll.includes("haj") || textKoll.includes("delfin")) {
-                livsmiljö = "Världens stora hav, oceaner eller sötvattendrag. De är mästare på att simma.";
-                mat = "Plankton, krill, småfisk eller marina växter beroende på artens storlek.";
-            } else if (textKoll.includes("fågel") || textKoll.includes("örn") || textKoll.includes("falk") || textKoll.includes("uggla")) {
-                livsmiljö = "Uppe i luften, i höga trädtoppar, klippavsatser och skogar över hela världen.";
-                mat = "Insekter, frön, bär, eller mindre bytesdjur som de upptäcker med sin skarpa syn.";
+            
+            // Smarta lokala anpassningar baserat på sökordet
+            if (textKoll.includes("val") || textKoll.includes("delfin") || textKoll.includes("valhaj")) {
+                livsmiljö = "De djupa världshaven och oceanerna. Vandrar ofta långa sträckor.";
+                mat = "Små marina kräftdjur (krill), plankton eller fiskar.";
+                symbol = "🐋";
+            } else if (textKoll.includes("haj") || textKoll.includes("fisk") || textKoll.includes("torsk")) {
+                livsmiljö = "Hav, sjöar, korallrev eller strömmande vattendrag.";
+                mat = "Vattenväxter, alger eller mindre vattenlevande djur.";
+                symbol = "🐟";
+            } else if (textKoll.includes("fågel") || textKoll.includes("örn") || textKoll.includes("uggla") || textKoll.includes("mås")) {
+                livsmiljö = "Skogar, klippor, trädtoppar eller öppna landskap över hela världen.";
+                mat = "Insekter, frön, bär, fiskar eller mindre bytesdjur.";
+                symbol = "🦅";
             } else if (textKoll.includes("orm") || textKoll.includes("ödla") || textKoll.includes("krokodil")) {
-                livsmiljö = "Varma klimat, öknar, tropiska regnskogar eller klippiga områden.";
-                mat = "Insekter, ägg, eller mindre djur som de sväljer hela.";
+                livsmiljö = "Tropiska regnskogar, torra öknar eller varma klippområden.";
+                mat = "Små däggdjur, insekter, fåglar eller ägg.";
+                symbol = "🐍";
+            } else if (textKoll.includes("lejon") || textKoll.includes("tiger") || textKoll.includes("katt") || textKoll.includes("lo")) {
+                livsmiljö = "Savanner, täta djungler, skogar eller i närheten av människor.";
+                mat = "Kött. De är skickliga jägare med extremt vassa sinnen.";
+                symbol = "🦁";
+            } else if (textKoll.includes("hund") || textKoll.includes("varg") || textKoll.includes("räv")) {
+                livsmiljö = "Skogsområden, tundra, berg eller som husdjur i hemmen.";
+                mat = "Kött, bytesdjur eller anpassat foder.";
+                symbol = "🐺";
+            } else if (textKoll.includes("insekt") || textKoll.includes("myra") || textKoll.includes("bi") || textKoll.includes("fluga")) {
+                livsmiljö = "I vegetationen, under stenar, i jorden eller surrande i luften.";
+                mat = "Nektar, växtsaft, blad eller andra mindre kryp.";
+                symbol = "🪲";
             }
 
-            // Bygg upp det färdiga resultatet på skärmen direkt utan nätverksanrop!
             innehallDiv.innerHTML = `
                 <div class="djur-layout">
                     <div class="djur-info">
@@ -168,7 +192,7 @@
                             ${mat}
                         </div>
                         
-                        <h3>Biologisk Beskrivning & Livsstil</h3>
+                        <h3>Biologisk Beskrivning</h3>
                         <p class="info-text">${beskrivning}</p>
                         
                         <p style="margin-top:20px;">
@@ -178,8 +202,7 @@
                         </p>
                     </div>
                     <div class="djur-bild-box">
-                        <!-- Laddar en garanterat säker naturbild från Unsplash med djurets namn som tema -->
-                        <img src="https://unsplash.com" alt="${djurNamn}">
+                        <div class="djur-ikon-box">${symbol}</div>
                     </div>
                 </div>
             `;
