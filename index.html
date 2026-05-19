@@ -3,134 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Världens Alla Djur</title>
+    <title>Djurvärldens Encyklopedi</title>
     <style>
         * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f7f4;
-            color: #2c3e50;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
             margin: 0;
             padding: 20px;
-            text-align: center;
+            min-height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: 30px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
         }
-        h1 { color: #1e4620; margin-bottom: 5px; }
-        p.subtitle { color: #7f8c8d; margin-bottom: 25px; }
+        h1 { 
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        p.subtitle { 
+            color: #94a3b8; 
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+        }
         
-        /* Meny med djurknappar */
+        /* Neon-knappar */
         .kategorier {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         .kat-knapp {
-            padding: 12px 20px;
-            border: none;
-            background-color: #2e7d32;
-            color: white;
-            border-radius: 25px;
+            padding: 14px 24px;
+            border: 2px solid #22c55e;
+            background-color: transparent;
+            color: #4ade80;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 15px;
-            transition: all 0.2s;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(34, 197, 94, 0.1);
         }
-        .kat-knapp:hover, .kat-knapp.aktiv {
-            background-color: #1b5e20;
-            transform: translateY(-2px);
+        .kat-knapp:hover {
+            background-color: rgba(34, 197, 94, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(34, 197, 94, 0.3);
+        }
+        .kat-knapp.aktiv {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: #0f172a;
+            border-color: #4ade80;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+            transform: translateY(-1px);
         }
 
-        /* Layout för djurvisning */
+        /* Layout */
         .djur-layout {
             display: flex;
-            gap: 25px;
+            gap: 35px;
             flex-wrap: wrap;
             text-align: left;
-            border-top: 2px solid #f0f7f4;
-            padding-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .djur-info { flex: 1; min-width: 300px; }
-        .djur-bild-box { flex: 1; min-width: 300px; text-align: center; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .djur-info { flex: 1.2; min-width: 300px; }
+        .djur-bild-box { flex: 0.8; min-width: 280px; text-align: center; }
         
         img {
             max-width: 100%;
-            height: 250px;
+            height: 320px;
             object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s;
         }
+        img:hover {
+            transform: scale(1.03) rotate(1deg);
+        }
+
+        /* Fakta-kort */
         .fakta-punkt {
-            margin: 8px 0;
-            padding: 6px 12px;
-            background-color: #f4f9f4;
-            border-left: 4px solid #2e7d32;
-            border-radius: 0 4px 4px 0;
+            margin: 15px 0;
+            padding: 16px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border-left: 4px solid #4ade80;
+            border-radius: 0 12px 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.02);
+        }
+        .fakta-punkt strong {
+            color: #4ade80;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        h3 {
+            color: #f8fafc;
+            margin-top: 25px;
+            font-size: 1.3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🌍 Utforska Världens Djur 🦁</h1>
-        <p class="subtitle">Klicka på ett djur för att se var de bor, vad de äter och hur de lever!</p>
+        <h1>🌍 Djurvärldens Encyklopedi 🦁</h1>
+        <p class="subtitle">Utforska planetens vilda varelser – var de bor, vad de äter och hur de lever.</p>
         
-        <!-- Knappar för att välja djur -->
+        <!-- Meny -->
         <div class="kategorier" id="knappYta"></div>
 
-        <!-- Här visas djuret som valts -->
+        <!-- Innehåll -->
         <div id="djurInnehall"></div>
     </div>
 
     <script>
-        // Inbyggd databas med all fakta och säkra Unsplash-bilder
+        // Säkra, inbyggda data som garanterat fungerar utan felmeddelanden
         const djurDatabas = {
             blåval: {
                 namn: "Blåval 🐋",
-                bor: "Alla världens stora hav, men vandrar mot polerna på sommaren.",
-                ater: "Enormt stora mängder krill (små kräftdjur).",
-                fakta: "Blåvalen är det absolut största djuret som någonsin har levt på jorden. Bara dess tunga kan väga lika mycket som en hel elefant!",
+                bor: "Vandrar genom alla jordens stora världshav.",
+                ater: "Äter upp till 4 ton krill (små kräftdjur) varje dag.",
+                fakta: "Blåvalen är jordens största levande varelse. Dess hjärta är lika stort som en liten bil, och dess sång kan höras hundratals mil under vattnet.",
                 bild: "https://unsplash.com"
             },
             lejon: {
                 namn: "Lejon 🦁",
-                bor: "Subsahariska Afrika samt i en liten skyddad skog i Indien.",
-                ater: "Kött (zebror, gnuantiloper och andra gräsätare).",
-                fakta: "Lejon lever i flockar, till skillnad från de flesta andra kattdjur. Det är oftast honoma (lejoninnorna) som jagar tillsammans.",
+                bor: "Afrikas savanner samt ett skyddat skogsområde i Indien.",
+                ater: "Stora hovdjur som zebror, gnuantiloper och bufflar.",
+                fakta: "Kallas för djurens konung. De lever i flockar (prides) styrt av lejoninnor, som också sköter den mesta av jakten under natten.",
                 bild: "https://unsplash.com"
             },
             schimpans: {
                 namn: "Schimpans 🐒",
-                bor: "Tropiska regnskogar och fuktiga savanner i Central- och Västafrika.",
-                ater: "Frukt, blad, frön, insekter och ibland mindre djur.",
-                fakta: "Schimpanser är otroligt smarta och använder verktyg, som pinnar för att fiska efter termiter eller stenar för att knäcka nötter.",
+                bor: "Centralafrikas täta regnskogar och djupa djungler.",
+                ater: "Främst frukter, nötter och blad, men ibland även insekter.",
+                fakta: "Dela över 98% av sitt DNA med människan. De är extremt intelligenta och kan tillverka egna verktyg för att få tag i mat.",
                 bild: "https://unsplash.com"
             },
             albatross: {
                 namn: "Albatross 🦅",
-                bor: "Södra oceanen och norra Stilla havet, mestadels uppe i luften över öppet hav.",
-                ater: "Fisk, bläckfisk och krill som de fångar vid havsytan.",
-                fakta: "De har världens största vingspann (upp till 3,5 meter). De kan flyga tusentals mil utan att slå med vingarna en enda gång!",
+                bor: "Hela södra oceanen. De lever nästan hela sitt liv i luften.",
+                ater: "Fiskar, bläckfiskar och krill direkt från havsytan.",
+                fakta: "Har ett enormt vingspan på upp till 3.5 meter. De kan glidflyga i flera år över haven utan att någonsin landa på fast mark.",
                 bild: "https://unsplash.com"
             },
             guldfisk: {
                 namn: "Guldfisk 🐠",
-                bor: "Ursprungligen från sötvatten i Östasien, nu i akvarier och dammar över hela världen.",
-                ater: "Alger, växter, små insekter och färdigt fiskfoder.",
-                fakta: "Det är en myt att guldfiskar bara har tre sekunders minne. Forskning visar att de kan komma ihåg saker i flera månader!",
+                bor: "Sötvattendrag i Östasien samt i dammar jorden runt.",
+                ater: "Plankton, små insekter, alger och växtdelar.",
+                fakta: "Att de bara har 3 sekunders minne är helt fel! De kan lära sig klockslag, känna igen sina ägare och minnas saker i flera månader.",
                 bild: "https://unsplash.com"
             }
         };
 
-        // Funktion för att rita upp knapparna automatiskt
         function skapaMeny() {
             const knappYta = document.getElementById('knappYta');
             let forstaDjur = true;
@@ -140,7 +187,11 @@
                 const knapp = document.createElement('button');
                 knapp.className = 'kat-knapp' + (forstaDjur ? ' aktiv' : '');
                 knapp.innerText = djur.namn;
-                knapp.onclick = (e) => visaDjur(nyckel, e.target);
+                knapp.onclick = (e) => {
+                    // Om användaren klickar på själva texten inuti knappen
+                    const targetKnapp = e.target.tagName === 'BUTTON' ? e.target : e.target.parentElement;
+                    visaDjur(nyckel, targetKnapp);
+                };
                 knappYta.appendChild(knapp);
                 
                 if (forstaDjur) {
@@ -150,7 +201,6 @@
             }
         }
 
-        // Funktion för att visa valt djurs fakta
         function visaDjur(id, knappElement) {
             if (knappElement) {
                 document.querySelectorAll('.kat-knapp').forEach(btn => btn.classList.remove('aktiv'));
@@ -163,13 +213,19 @@
             innehallDiv.innerHTML = `
                 <div class="djur-layout">
                     <div class="djur-info">
-                        <h2 style="color:#2e7d32; margin-top:0;">${djur.namn}</h2>
+                        <h2 style="color:#4ade80; margin-top:0; font-size: 1.8rem;">${djur.namn}</h2>
                         
-                        <div class="fakta-punkt"><b>🌍 Var de lever/bor:</b> ${djur.bor}</div>
-                        <div class="fakta-punkt"><b>🥩 Vad de äter:</b> ${djur.ater}</div>
+                        <div class="fakta-punkt">
+                            <strong>🏠 Livsmiljö & boplats</strong>
+                            ${djur.bor}
+                        </div>
+                        <div class="fakta-punkt">
+                            <strong>🥩 Föda & kost</strong>
+                            ${djur.ater}
+                        </div>
                         
-                        <h3 style="margin-top:20px; color:#1e4620;">Hur de lever & Livsstil</h3>
-                        <p style="line-height: 1.6; font-size: 15px;">${djur.fakta}</p>
+                        <h3>Unik Livsstil & Biologi</h3>
+                        <p style="line-height: 1.7; color: #cbd5e1; font-size: 15px;">${djur.fakta}</p>
                     </div>
                     <div class="djur-bild-box">
                         <img src="${djur.bild}" alt="${djur.namn}">
@@ -178,7 +234,6 @@
             `;
         }
 
-        // Kör igång programmet direkt när sidan laddas
         window.onload = skapaMeny;
     </script>
 
