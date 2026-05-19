@@ -31,53 +31,92 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
             letter-spacing: -1px;
+            text-align: center;
         }
         p.subtitle { 
             color: #94a3b8; 
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Nytt och supercoolt sökfält */
+        .sok-sektion {
+            max-width: 500px;
+            margin: 0 auto 35px auto;
+            display: flex;
+            gap: 10px;
+        }
+        .sok-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #334155;
+            background-color: rgba(15, 23, 42, 0.6);
+            color: #fff;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .sok-input:focus {
+            border-color: #4ade80;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+        }
+        .sok-knapp {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: #0f172a;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+        }
+        .sok-knapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(34, 197, 94, 0.5);
         }
         
-        /* Neon-knappar */
+        /* Snabbknappar */
         .kategorier {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 40px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
         }
         .kat-knapp {
-            padding: 14px 24px;
-            border: 2px solid #22c55e;
+            padding: 10px 18px;
+            border: 1px solid rgba(74, 222, 128, 0.4);
             background-color: transparent;
-            color: #4ade80;
+            color: #94a3b8;
             border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(34, 197, 94, 0.1);
+            font-size: 14px;
+            transition: all 0.2s;
         }
         .kat-knapp:hover {
-            background-color: rgba(34, 197, 94, 0.1);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            border-color: #4ade80;
+            background-color: rgba(34, 197, 94, 0.05);
         }
         .kat-knapp.aktiv {
-            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-            color: #0f172a;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
             border-color: #4ade80;
-            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
-            transform: translateY(-1px);
         }
 
-        /* Layout */
+        /* Layout för djurvisning */
         .djur-layout {
             display: flex;
             gap: 35px;
             flex-wrap: wrap;
             text-align: left;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-in-out;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -95,9 +134,7 @@
             border: 2px solid rgba(255,255,255,0.1);
             transition: transform 0.3s;
         }
-        img:hover {
-            transform: scale(1.03) rotate(1deg);
-        }
+        img:hover { transform: scale(1.02); }
 
         /* Fakta-kort */
         .fakta-punkt {
@@ -106,7 +143,6 @@
             background-color: rgba(15, 23, 42, 0.6);
             border-left: 4px solid #4ade80;
             border-radius: 0 12px 12px 0;
-            border-top: 1px solid rgba(255,255,255,0.02);
         }
         .fakta-punkt strong {
             color: #4ade80;
@@ -114,7 +150,6 @@
             margin-bottom: 4px;
             font-size: 0.95rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         h3 {
             color: #f8fafc;
@@ -123,23 +158,37 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 8px;
         }
+        .info-text { line-height: 1.7; color: #cbd5e1; font-size: 15px; }
+        .status-meddelande { color: #94a3b8; text-align: center; padding: 20px; font-style: italic; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>🌍 Djurvärldens Encyklopedi 🦁</h1>
-        <p class="subtitle">Utforska planetens vilda varelser – var de bor, vad de äter och hur de lever.</p>
+        <p class="subtitle">Sök fritt bland världens alla djur eller använd snabbknapparna!</p>
         
-        <!-- Meny -->
-        <div class="kategorier" id="knappYta"></div>
+        <!-- SÖKFÄLT -->
+        <div class="sok-sektion">
+            <input type="text" id="sokFalt" class="sok-input" placeholder="Skriv valfritt djur på svenska...">
+            <button onclick="sökFrittDjur()" class="sok-knapp">Sök</button>
+        </div>
 
-        <!-- Innehåll -->
+        <!-- Snabbval -->
+        <div class="kategorier" id="knappYta">
+            <button class="kat-knapp aktiv" onclick="visaInbyggtDjur('blåval', this)">🐋 Blåval</button>
+            <button class="kat-knapp" onclick="visaInbyggtDjur('lejon', this)">🦁 Lejon</button>
+            <button class="kat-knapp" onclick="visaInbyggtDjur('schimpans', this)">🐒 Schimpans</button>
+            <button class="kat-knapp" onclick="visaInbyggtDjur('albatross', this)">🦅 Albatross</button>
+            <button class="kat-knapp" onclick="visaInbyggtDjur('guldfisk', this)">🐠 Guldfisk</button>
+        </div>
+
+        <!-- Här visas resultatet -->
         <div id="djurInnehall"></div>
     </div>
 
     <script>
-        // Säkra, inbyggda data som garanterat fungerar utan felmeddelanden
+        // Inbyggda favoriter (för snabbknapparna)
         const djurDatabas = {
             blåval: {
                 namn: "Blåval 🐋",
@@ -157,59 +206,93 @@
             },
             schimpans: {
                 namn: "Schimpans 🐒",
-                bor: "Centralafrikas täta regnskogar och djupa djungler.",
+                bor: "Centralafrikas täta regnskogar och djungelel.",
                 ater: "Främst frukter, nötter och blad, men ibland även insekter.",
-                fakta: "Dela över 98% av sitt DNA med människan. De är extremt intelligenta och kan tillverka egna verktyg för att få tag i mat.",
+                fakta: "Delar över 98% av sitt DNA med människan. De är extremt intelligenta och kan tillverka egna verktyg för att få tag i mat.",
                 bild: "https://unsplash.com"
             },
             albatross: {
                 namn: "Albatross 🦅",
                 bor: "Hela södra oceanen. De lever nästan hela sitt liv i luften.",
                 ater: "Fiskar, bläckfiskar och krill direkt från havsytan.",
-                fakta: "Har ett enormt vingspan på upp till 3.5 meter. De kan glidflyga i flera år över haven utan att någonsin landa på fast mark.",
+                fakta: "Har ett enormt vingspann på upp till 3.5 meter. De kan glidflyga i flera år över haven utan att någonsin landa på fast mark.",
                 bild: "https://unsplash.com"
             },
             guldfisk: {
                 namn: "Guldfisk 🐠",
                 bor: "Sötvattendrag i Östasien samt i dammar jorden runt.",
                 ater: "Plankton, små insekter, alger och växtdelar.",
-                fakta: "Att de bara har 3 sekunders minne är helt fel! De kan lära sig klockslag, känna igen sina ägare och minnas saker i flera månader.",
+                fakta: "Att de bara har 3 sekunders minne är helt fel! De kan lära siig klockslag, känna igen sina ägare och minnas saker i flera månader.",
                 bild: "https://unsplash.com"
             }
         };
 
-        function skapaMeny() {
-            const knappYta = document.getElementById('knappYta');
-            let forstaDjur = true;
+        // Lyssna på Enter-knappen i sökfältet
+        document.getElementById('sokFalt').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sökFrittDjur();
+        });
 
-            for (const nyckel in djurDatabas) {
-                const djur = djurDatabas[nyckel];
-                const knapp = document.createElement('button');
-                knapp.className = 'kat-knapp' + (forstaDjur ? ' aktiv' : '');
-                knapp.innerText = djur.namn;
-                knapp.onclick = (e) => {
-                    // Om användaren klickar på själva texten inuti knappen
-                    const targetKnapp = e.target.tagName === 'BUTTON' ? e.target : e.target.parentElement;
-                    visaDjur(nyckel, targetKnapp);
-                };
-                knappYta.appendChild(knapp);
-                
-                if (forstaDjur) {
-                    visaDjur(nyckel);
-                    forstaDjur = false;
-                }
-            }
-        }
-
-        function visaDjur(id, knappElement) {
+        // Funktion för snabbknapparna
+        function visaInbyggtDjur(id, knappElement) {
             if (knappElement) {
                 document.querySelectorAll('.kat-knapp').forEach(btn => btn.classList.remove('aktiv'));
                 knappElement.classList.add('aktiv');
             }
+            renderaDjurKort(djurDatabas[id]);
+        }
 
-            const djur = djurDatabas[id];
+        // Funktion för den fria sökrutan
+        async function sökFrittDjur() {
+            const sökordRaw = document.getElementById('sokFalt').value.trim();
             const innehallDiv = document.getElementById('djurInnehall');
+            
+            if (!sökordRaw) return;
 
+            // Avmarkera snabbknappar
+            document.querySelectorAll('.kat-knapp').forEach(btn => btn.classList.remove('aktiv'));
+            innehallDiv.innerHTML = '<div class="status-meddelande">Söker i det globala djurregistret...</div>';
+
+            // Formatera sökordet till Stor begynnelsebokstav (t.ex. "Varg")
+            const sökord = sökordRaw.charAt(0).toUpperCase() + sökordRaw.slice(1).toLowerCase();
+
+            // Kolla om djuret redan finns inbyggt först
+            if (djurDatabas[sökordRaw.toLowerCase()]) {
+                visaInbyggtDjur(sökordRaw.toLowerCase());
+                return;
+            }
+
+            try {
+                // Hämtar live från svenska Wikipedia på ett helt säkert sätt
+                const url = `https://wikipedia.org{encodeURIComponent(sökord)}`;
+                const svar = await fetch(url);
+                
+                if (!svar.ok) {
+                    innehallDiv.innerHTML = `<div class="status-meddelande" style="color:#ef4444;">Kunde inte hitta "${sökord}". Kontrollera stavningen eller testa ett annat djur!</div>`;
+                    return;
+                }
+                
+                const data = await svar.json();
+
+                // Skapa ett dynamiskt djurobjekt baserat på Wikipedia-datan
+                const sökResultatDjur = {
+                    namn: data.title,
+                    bor: "Se artikeln nedan för detaljerad livsmiljö.",
+                    ater: "Varierad kost beroende på artens exakta undergrupp.",
+                    fakta: data.extract,
+                    bild: data.thumbnail ? data.thumbnail.source : "https://unsplash.com" // Cool reservbild om bild saknas
+                };
+
+                renderaDjurKort(sökResultatDjur, data.content_urls?.desktop?.page);
+
+            } catch (fel) {
+                // Om nätverket blockerar Wikipedia, körs denna backup så sidan aldrig fryser!
+                innehallDiv.innerHTML = `<div class="status-meddelande" style="color:#f59e0b;">Nätverket förhindrade livesökning. Men du kan alltid använda de inbyggda snabbknapparna ovan!</div>`;
+            }
+        }
+
+        // Bygger och visar HTML-koden på skärmen
+        function renderaDjurKort(djur, wikiLänk) {
+            const innehallDiv = document.getElementById('djurInnehall');
             innehallDiv.innerHTML = `
                 <div class="djur-layout">
                     <div class="djur-info">
@@ -224,17 +307,20 @@
                             ${djur.ater}
                         </div>
                         
-                        <h3>Unik Livsstil & Biologi</h3>
-                        <p style="line-height: 1.7; color: #cbd5e1; font-size: 15px;">${djur.fakta}</p>
+                        <h3>Information & Livsstil</h3>
+                        <p class="info-text">${djur.fakta}</p>
+                        
+                        ${wikiLänk ? `<p style="margin-top:20px;"><a href="${wikiLänk}" target="_blank" style="color:#4ade80; font-weight:bold; text-decoration:none;">Öppna forskningsarkiv för ${djur.namn} ➔</a></p>` : ''}
                     </div>
                     <div class="djur-bild-box">
-                        <img src="${djur.bild}" alt="${djur.namn}">
+                        <img src="${djur.bild}" alt="${djur.namn}" onerror="this.src='https://unsplash.com'">
                     </div>
                 </div>
             `;
         }
 
-        window.onload = skapaMeny;
+        // Starta med att visa blåvalen när sidan laddas första gången
+        window.onload = () => visaInbyggtDjur('blåval');
     </script>
 
 </body>
