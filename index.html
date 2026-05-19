@@ -3,183 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utforska ALLA Världens Djur</title>
+    <title>Världens Alla Djur</title>
     <style>
-        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef5ed;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f7f4;
             color: #2c3e50;
-            margin: 0;
+            text-align: center;
             padding: 20px;
+            margin: 0;
         }
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            max-width: 650px;
+            margin: 40px auto;
             background: white;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
         }
-        h1 { text-align: center; color: #1e4620; margin-bottom: 5px; }
-        p.subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; }
-        
-        /* Filter och navigering */
-        .Kategorier {
+        h1 {
+            color: #1e4620;
+            margin-top: 0;
+        }
+        .sok-lada {
+            margin: 20px 0;
             display: flex;
-            justify-content: center;
             gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
+            justify-content: center;
         }
-        .kat-knapp {
-            padding: 12px 20px;
-            border: none;
-            background-color: #27ae60;
+        input {
+            padding: 12px;
+            width: 65%;
+            border: 2px solid #2e7d32;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #2e7d32;
             color: white;
-            border-radius: 25px;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
             font-weight: bold;
-            transition: all 0.2s;
         }
-        .kat-knapp:hover, .kat-knapp.aktiv {
-            background-color: #1e6b3c;
-            transform: translateY(-2px);
+        button:hover {
+            background-color: #1b5e20;
         }
-
-        /* Djur-rutnät */
-        .djur-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+        #resultat {
+            margin-top: 30px;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
         }
-        .djur-kort {
-            background: #fdfdfd;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-        .djur-kort:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-        }
-        .djur-bild {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
+        img {
+            max-width: 100%;
+            height: auto;
             border-radius: 8px;
-            background-color: #eaeaea;
-            margin-bottom: 10px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .vetenskapligt-namn {
-            font-style: italic;
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        .laddar {
-            text-align: center;
-            font-size: 1.2em;
-            grid-column: 1 / -1;
-            padding: 40px;
-            color: #27ae60;
+        .felmeddelande {
+            color: #c0392b;
+            background-color: #fdedec;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 5px solid #e74c3c;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🌍 ALLA Världens Djurarter 🦁</h1>
-        <p class="subtitle">Hämtar data live från globala forskardatabaser (GBIF)</p>
+        <h1>🦁 Världens Alla Djur 🌍</h1>
+        <p>Skriv ett djur på svenska (t.ex. blåval, fästing, schimpans, guldfisk):</p>
         
-        <!-- Knappar för att välja djurgrupp -->
-        <div class="Kategorier">
-            <button class="kat-knapp aktiv" onclick="bytaKategori('Mammalia', this)">Däggdjur</button>
-            <button class="kat-knapp" onclick="bytaKategori('Aves', this)">Fåglar</button>
-            <button class="kat-knapp" onclick="bytaKategori('Actinopterygii', this)">Fiskar</button>
-            <button class="kat-knapp" onclick="bytaKategori('Insecta', this)">Insekter</button>
-            <button class="kat-knapp" onclick="bytaKategori('Reptilia', this)">Reptiler</button>
+        <div class="sok-lada">
+            <input type="text" id="djurInmatning" placeholder="Skriv ett djurnamn...">
+            <button onclick="sokDjur()">Sök djur</button>
         </div>
 
-        <!-- Här visas alla djur -->
-        <div class="djur-grid" id="djurLista">
-            <div class="laddar">Laddar in djurvärlden...</div>
-        </div>
+        <div id="resultat"></div>
     </div>
 
     <script>
-        // Djurrikets ID i GBIF-databasen är 1
-        const ANIMALIA_ID = 1; 
+        // Gör det möjligt att trycka på 'Enter' i fältet för att söka
+        document.getElementById('djurInmatning').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sokDjur();
+            }
+        });
 
-        async function hamtaDjur(klassNamn) {
-            const listaDiv = document.getElementById('djurLista');
-            listaDiv.innerHTML = '<div class="laddar">Hämtar djurarter från databasen...</div>';
+        async function sokDjur() {
+            const inputFalt = document.getElementById('djurInmatning');
+            const resultatDiv = document.getElementById('resultat');
+            
+            // Gör om texten så att första bokstaven alltid är stor och resten små (t.ex. "Blåval")
+            let sökord = inputFalt.value.trim();
+            if (!sökord) {
+                resultatDiv.innerHTML = '<p class="felmeddelande">Vänligen skriv in ett djurnamn först.</p>';
+                return;
+            }
+            
+            sökord = sökord.charAt(0).toUpperCase() + sökord.slice(1).toLowerCase();
+
+            resultatDiv.innerHTML = '<p style="color: #7f8c8d;">Söker i djurdatabasen...</p>';
 
             try {
-                // 1. Hitta ID för den valda djurklassen (t.ex. Däggdjur)
-                const klassUrl = `https://gbif.org{klassNamn}`;
-                const klassSvar = await fetch(klassUrl);
-                const klassData = await klassSvar.json();
-                const klassKey = klassData.classKey;
-
-                // 2. Hämta de nu levande arterna i den klassen som har bilder
-                const artUrl = `https://gbif.org{klassKey}&mediaType=StillImage&limit=20&status=ACCEPTED`;
-                const artSvar = await fetch(artUrl);
-                const artData = await artSvar.json();
-
-                listaDiv.innerHTML = ''; // Rensa laddningstexten
-
-                // Håll koll på unika arter så vi inte visar samma djur två gånger
-                const visadeArter = new Set();
-
-                artData.results.forEach(observation => {
-                    const namn = observation.species || observation.scientificName;
-                    
-                    // Kontrollera att arten har ett namn, en bild och inte redan visas
-                    if (namn && observation.media && observation.media[0] && !visadeArter.has(namn)) {
-                        visadeArter.add(namn);
-                        
-                        const bildUrl = observation.media[0].identifier;
-                        const land = observation.country || "Okänt område";
-
-                        // Skapa kortet för djuret
-                        const kort = document.createElement('div');
-                        kort.className = 'djur-kort';
-                        kort.innerHTML = `
-                            <img class="djur-bild" src="${bildUrl}" alt="${namn}" onerror="this.src='https://placehold.co'">
-                            <h3>${namn}</h3>
-                            <p class="vetenskapligt-namn">Lever i: ${land}</p>
-                            <p style="font-size: 0.85em; color: #555;"><b>Status:</b> Vildlevande art</p>
-                        `;
-                        listaDiv.appendChild(kort);
-                    }
-                });
-
-                if(listaDiv.children.length === 0) {
-                    listaDiv.innerHTML = '<p>Kunde inte ladda bilder just nu. Försök igen.</p>';
+                // Nu anropar vi SVENSKA wikipedia (.sv istället för .en)
+                const url = `https://wikipedia.org{encodeURIComponent(sökord)}`;
+                const svar = await fetch(url);
+                
+                if (!svar.ok) {
+                    throw new Error(`Kunde inte hitta "${sökord}". Kontrollera stavningen eller prova ett annat djur.`);
                 }
 
+                const data = await svar.json();
+
+                // Bygger upp sidan med den funna informationen
+                let htmlInnehall = `<h2 style="color:#2e7d32; margin-bottom:5px;">${data.title}</h2>`;
+                
+                if (data.thumbnail) {
+                    htmlInnehall += `<img src="${data.thumbnail.source}" alt="${data.title}">`;
+                }
+                
+                htmlInnehall += `<p style="line-height: 1.6; font-size: 16px;">${data.extract}</p>`;
+                htmlInnehall += `<p style="margin-top:20px;"><a href="${data.content_urls.desktop.page}" target="_blank" style="color:#2e7d32; font-weight:bold; text-decoration:none;">Läs hela artikeln på Wikipedia ➔</a></p>`;
+
+                resultatDiv.innerHTML = htmlInnehall;
+
             } catch (fel) {
-                console.error(fel);
-                listaDiv.innerHTML = '<p style="color:red; grid-column: 1/-1;">Ett fel uppstod när djuren skulle hämtas.</p>';
+                resultatDiv.innerHTML = `<p class="felmeddelande">${fel.message}</p>`;
             }
         }
-
-        function bytaKategori(klassNamn, knappElement) {
-            // Uppdatera vilken knapp som ser aktiv ut
-            document.querySelectorAll('.kat-knapp').forEach(btn => btn.classList.remove('aktiv'));
-            knappElement.classList.add('aktiv');
-            
-            // Hämta djuren för den valda kategorin
-            hamtaDjur(klassNamn);
-        }
-
-        // Starta hemsidan med att ladda Däggdjur automatiskt
-        window.onload = () => hamtaDjur('Mammalia');
     </script>
 
 </body>
 </html>
-
